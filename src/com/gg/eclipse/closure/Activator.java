@@ -1,4 +1,4 @@
-package eclipse_closure_builder;
+package com.gg.eclipse.closure;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -10,7 +10,7 @@ import org.osgi.framework.BundleContext;
 public class Activator extends AbstractUIPlugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "Eclipse_Closure_Builder";
+	public static final String PLUGIN_ID = "com.gg.eclipse.closure";
 
 	// The shared instance
 	private static Activator plugin;

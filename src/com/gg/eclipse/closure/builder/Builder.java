@@ -1,4 +1,4 @@
-package eclipse_closure_builder.builder;
+package com.gg.eclipse.closure.builder;
 
 import java.util.Map;
 import java.util.logging.Level;
@@ -20,7 +20,7 @@ import com.google.javascript.jscomp.JSSourceFile;
 import com.google.javascript.jscomp.WarningLevel;
 
 
-public class SampleBuilder extends IncrementalProjectBuilder {
+public class Builder extends IncrementalProjectBuilder {
 
 	class SampleDeltaVisitor implements IResourceDeltaVisitor {
 		/*
@@ -57,27 +57,10 @@ public class SampleBuilder extends IncrementalProjectBuilder {
 	}
 
 	
-	public static final String BUILDER_ID = "Eclipse_Closure_Builder.sampleBuilder";
-
-	private static final String MARKER_TYPE = "Eclipse_Closure_Builder.xmlProblem";
+	public static final String BUILDER_ID = "com.gg.eclipse.closure.builder";
 
 
-/*
-	private void addMarker(IFile file, String message, int lineNumber,
-			int severity) {
-		try {
-			IMarker marker = file.createMarker(MARKER_TYPE);
-			marker.setAttribute(IMarker.MESSAGE, message);
-			marker.setAttribute(IMarker.SEVERITY, severity);
-			if (lineNumber == -1) {
-				lineNumber = 1;
-			}
-			marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
-		} catch (CoreException e) {
-		}
-	}
 
-*/
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -111,22 +94,17 @@ public class SampleBuilder extends IncrementalProjectBuilder {
 	}
 	
 	private void runClosureCompile(IFile file){
-		
 		Compiler.setLoggingLevel(Level.SEVERE);
 		Compiler jsCompiler = new Compiler(new ReportingErrorManager(file));
 		
 		CompilerOptions options = getCompilerOptions();
 		
-		final JSSourceFile source;
 		try {
-			source = JSSourceFile.fromInputStream(file.getName(), file.getContents());
+			JSSourceFile source = JSSourceFile.fromInputStream(file.getName(), file.getContents());
+			jsCompiler.compile(new JSSourceFile[]{}, new JSSourceFile[]{source}, options);
 		} catch (Exception e) {
-			// TODO remove after testing
 			e.printStackTrace();
-			return;
 		}
-		
-		jsCompiler.compile(new JSSourceFile[]{}, new JSSourceFile[]{source}, options);
 	}
 
 
@@ -143,17 +121,15 @@ public class SampleBuilder extends IncrementalProjectBuilder {
 
 	private void deleteMarkers(IFile file) {
 		try {
-			file.deleteMarkers(MARKER_TYPE, false, IResource.DEPTH_ZERO);
-		} catch (CoreException ce) {
-		}
+			file.deleteMarkers(ReportingErrorManager.MARKER_TYPE, false, IResource.DEPTH_ZERO);
+		} catch (CoreException ce) {}
 	}
 
 	protected void fullBuild(final IProgressMonitor monitor)
 			throws CoreException {
 		try {
 			getProject().accept(new SampleResourceVisitor());
-		} catch (CoreException e) {
-		}
+		} catch (CoreException e) {}
 	}
 
 
