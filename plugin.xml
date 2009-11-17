@@ -3,27 +3,27 @@
 <plugin>
 
    <extension
-         id="sampleBuilder"
-         name="Sample Project Builder"
+         id="builder"
+         name="Closure Builder"
          point="org.eclipse.core.resources.builders">
       <builder
             hasNature="true">
          <run
-               class="eclipse_closure_builder.builder.SampleBuilder">
+               class="com.gg.eclipse.closure.builder.Builder">
          </run>
       </builder>
    </extension>
    <extension
-         id="sampleNature"
-         name="Sample Project Nature"
+         id="nature"
+         name="Closure Nature"
          point="org.eclipse.core.resources.natures">
       <runtime>
          <run
-               class="eclipse_closure_builder.builder.SampleNature">
+               class="com.gg.eclipse.closure.builder.Nature">
          </run>
       </runtime>
       <builder
-            id="Eclipse_Closure_Builder.sampleBuilder">
+            id="com.gg.eclipse.closure.builder">
       </builder>
    </extension>
    <extension
@@ -32,19 +32,19 @@
             adaptable="true"
             objectClass="org.eclipse.core.resources.IProject"
             nameFilter="*"
-            id="Eclipse_Closure_Builder.contribution1">
+            id="com.gg.eclipse.closure.contribution1">
          <action
-               label="Add/Remove Sample Nature"
-               class="eclipse_closure_builder.builder.ToggleNatureAction"
+               label="Add/Remove Closure Nature"
+               class="com.gg.eclipse.closure.builder.ToggleNatureAction"
                menubarPath="additions"
                enablesFor="+"
-               id="Eclipse_Closure_Builder.addRemoveNatureAction">
+               id="com.gg.eclipse.closure.addRemoveNatureAction">
          </action>
       </objectContribution>
    </extension>
    <extension
-         id="xmlProblem"
-         name="XML Problem"
+         id="jsProblem"
+         name="Javascript Problem"
          point="org.eclipse.core.resources.markers">
       <super
             type="org.eclipse.core.resources.problemmarker">
