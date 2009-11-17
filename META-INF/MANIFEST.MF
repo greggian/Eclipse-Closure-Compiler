@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Eclipse_Closure_Builder
+Bundle-SymbolicName: Eclipse_Closure_Builder; singleton:=true
+Bundle-Version: 1.0.1.qualifier
+Bundle-Activator: eclipse_closure_builder.Activator
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.core.resources
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ClassPath: .,
+ lib/compiler.jar
