@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: com.gg.eclipse.closure
-Bundle-SymbolicName: com.gg.eclipse.closure; singleton:=true
+Bundle-SymbolicName: com.gg.eclipse.closure;singleton:=true
 Bundle-Version: 1.0.1.qualifier
 Bundle-Activator: com.gg.eclipse.closure.Activator
 Require-Bundle: org.eclipse.ui,

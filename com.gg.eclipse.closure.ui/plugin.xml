@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.ui.propertyPages">
+      <page
+            name="Closure Compiler"
+            category="org.eclipse.wst.jsdt.internal.ui.preferences.JavaScriptMainPage"
+            class="com.gg.eclipse.closure.ui.properties.SamplePropertyPage"
+            id="com.gg.eclipse.closure.ui.properties.samplePropertyPage">
+         <enabledWhen>
+             <adapt type="org.eclipse.core.resources.IProject">
+		          <!--
+		          <test property="org.eclipse.core.resources.projectNature" value="org.eclipse.wst.jsdt.core.jsNature"/>
+		          -->
+		     </adapt>
+         </enabledWhen>
+      </page>
+   </extension>
+
+</plugin>
