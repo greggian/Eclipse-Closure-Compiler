@@ -11,9 +11,7 @@
             id="com.gg.eclipse.closure.ui.properties.samplePropertyPage">
          <enabledWhen>
              <adapt type="org.eclipse.core.resources.IProject">
-		          <!--
 		          <test property="org.eclipse.core.resources.projectNature" value="org.eclipse.wst.jsdt.core.jsNature"/>
-		          -->
 		     </adapt>
          </enabledWhen>
       </page>
