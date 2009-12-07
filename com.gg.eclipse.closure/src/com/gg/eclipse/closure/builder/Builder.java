@@ -126,9 +126,8 @@ public class Builder extends IncrementalProjectBuilder {
 		String outputFolder = prj.getPersistentProperty(new QualifiedName("","CLOSURE_OUTPUT_PATH"));
 		IPath relativeOutput = new Path(outputFolder).makeAbsolute().makeRelativeTo(prj.getFullPath());
 		IPath outputPath = relativeOutput.append("closureCompiled.js");
-		IPath out = outputPath.makeRelativeTo(outputPath);
 		
-		IFile outFile = prj.getFile(out);
+		IFile outFile = prj.getFile(outputPath);
 		if(outFile.exists()){
 			outFile.setContents(is, true, false, null);
 		}else{
