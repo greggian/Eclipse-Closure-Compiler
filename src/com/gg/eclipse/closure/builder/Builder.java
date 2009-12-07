@@ -1,5 +1,7 @@
 package com.gg.eclipse.closure.builder;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.Map;
 import java.util.logging.Level;
 
@@ -11,13 +13,19 @@ import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.QualifiedName;
+//import org.eclipse.wst.jsdt.core.IJavaScriptProject;
+//import org.eclipse.wst.jsdt.core.JavaScriptCore;
 
 
 import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.jscomp.JSSourceFile;
 import com.google.javascript.jscomp.WarningLevel;
+import com.google.javascript.jscomp.Result;
 
 
 public class Builder extends IncrementalProjectBuilder {
@@ -101,12 +109,32 @@ public class Builder extends IncrementalProjectBuilder {
 		
 		try {
 			JSSourceFile source = JSSourceFile.fromInputStream(file.getName(), file.getContents());
-			jsCompiler.compile(new JSSourceFile[]{}, new JSSourceFile[]{source}, options);
+			Result result = jsCompiler.compile(new JSSourceFile[]{}, new JSSourceFile[]{source}, options);
+			if(result.success){
+				writeResult(jsCompiler.toSource());
+			}
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
+	private void writeResult(String compiledJs) throws CoreException{
+		InputStream is = new ByteArrayInputStream(compiledJs.getBytes());
+		
+		IProject prj = getProject();
+		String outputFolder = prj.getPersistentProperty(new QualifiedName("","CLOSURE_OUTPUT_PATH"));
+		IPath relativeOutput = new Path(outputFolder).makeAbsolute().makeRelativeTo(prj.getFullPath());
+		IPath outputPath = relativeOutput.append("closureCompiled.js");
+		IPath out = outputPath.makeRelativeTo(outputPath);
+		
+		IFile outFile = prj.getFile(out);
+		if(outFile.exists()){
+			outFile.setContents(is, true, false, null);
+		}else{
+			outFile.create(is, true, null);
+		}
+	}
 
 	/**
 	 * @return
