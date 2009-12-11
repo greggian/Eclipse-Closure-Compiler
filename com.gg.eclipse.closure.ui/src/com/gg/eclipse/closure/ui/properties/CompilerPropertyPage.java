@@ -21,6 +21,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.PropertyPage;
@@ -29,56 +30,41 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.eclipse.ui.views.navigator.ResourceComparator;
 
 
-public class SamplePropertyPage extends PropertyPage {
+public class CompilerPropertyPage extends PropertyPage {
 
-
-	private static final int TEXT_FIELD_WIDTH = 50;
 	private static final String OUTPUT_PATH_PROPERTY = "CLOSURE_OUTPUT_PATH";
 	private static final String DEFAULT_OUTPUT_PATH = "bin";
-
+	
 	private Text outputPathText;
 
 	/**
 	 * Constructor for SamplePropertyPage.
 	 */
-	public SamplePropertyPage() {
+	public CompilerPropertyPage() {
 		super();
 	}
 
-	/*
-	private void addSeparator(Composite parent) {
-		Label separator = new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL);
-		GridData gridData = new GridData();
-		gridData.horizontalAlignment = GridData.FILL;
-		gridData.grabExcessHorizontalSpace = true;
-		separator.setLayoutData(gridData);
-	}
-	*/
+	private void addCompileOptionsGroup(Composite parent) {		
+		
+		Group group = new Group(parent, SWT.NONE);
+		group.setText("Compiler Output");
+		group.setLayout(new GridLayout(3, false));
+		group.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
+		
+		// Label for output folder field
+		Label outputPathLabel = new Label(group, SWT.NONE);
+		outputPathLabel.setText("Default output folder: ");
 
-	private void addSection(Composite parent) {
-		Composite composite = createDefaultComposite(parent);
-
-		// Label for owner field
-		Label outputPathLabel = new Label(composite, SWT.NONE);
-		outputPathLabel.setText("Output Path: ");
-
-		// Owner text field
-		outputPathText = new Text(composite, SWT.SINGLE | SWT.BORDER);
-		GridData gd = new GridData();
-		gd.widthHint = convertWidthInCharsToPixels(TEXT_FIELD_WIDTH);
-		outputPathText.setLayoutData(gd);
+		// output folder text field
+		outputPathText = new Text(group, SWT.SINGLE | SWT.BORDER);
+		outputPathText.setLayoutData(new GridData(GridData.FILL, GridData.CENTER, true, false));
 
 		
-		Button outputPathButton = new Button(composite, SWT.NONE);
+		Button outputPathButton = new Button(group, SWT.NONE);
+		outputPathButton.setText("Browse...");
 		outputPathButton.addSelectionListener(new SelectionListener(){
-
-			@Override
 			public void widgetDefaultSelected(SelectionEvent arg0) {
-				// TODO Auto-generated method stub
-				
 			}
-
-			@Override
 			public void widgetSelected(SelectionEvent arg0) {
 				String folder = chooseFolder();
 				if(folder != null){
@@ -87,8 +73,12 @@ public class SamplePropertyPage extends PropertyPage {
 			}
 			
 		});
+
 		
-		// Populate owner text field
+	}
+	
+	private void populateCompileOptionsGroup(){
+		// Populate output folder text field
 		try {
 			String owner =
 				((IResource) getElement()).getPersistentProperty(
@@ -97,17 +87,10 @@ public class SamplePropertyPage extends PropertyPage {
 		} catch (CoreException e) {
 			outputPathText.setText(DEFAULT_OUTPUT_PATH);
 		}
+		
 	}
 	
-	
-	private String chooseFolder() {
-		String initPath= ""; //$NON-NLS-1$
-		//if (fURLResult != null && "file".equals(fURLResult.getProtocol())) { //$NON-NLS-1$
-		//	initPath= (new File(fURLResult.getFile())).getPath();
-		//}
-		
-		//OutputLocationDialog dl;
-		
+	private String chooseFolder() {		
 		IProject curProj = (IProject)getElement();
 		
 		IWorkspaceRoot root = curProj.getWorkspace().getRoot();
@@ -130,9 +113,7 @@ public class SamplePropertyPage extends PropertyPage {
 		dialog.setTitle("title");
 		dialog.setMessage("message");
 		dialog.addFilter(filter);
-		//dialog.setInput(ResourcesPlugin.getWorkspace().getRoot());
 		dialog.setInput(curProj.getProject().getParent());
-		dialog.setInitialSelection(curProj.getProject());
 
 		IResource initSelection= null;
 		initSelection= curProj.findMember("bin");
@@ -145,12 +126,7 @@ public class SamplePropertyPage extends PropertyPage {
 		IContainer result = (IContainer)dialog.getFirstResult();
 		if (result != null) {
 			try {
-				//return result.getProjectRelativePath().toString();
 				return result.getFullPath().makeRelative().toOSString();
-				//URL url= new File(result).toURL();
-				//return url.toExternalForm();
-			//} catch (MalformedURLException e) {
-				//e.printStackTrace();
 			} catch (Throwable t){
 				t.printStackTrace();
 			}
@@ -158,33 +134,6 @@ public class SamplePropertyPage extends PropertyPage {
 		return null;
 	}
 	
-	/*
-	private void addSecondSection(Composite parent) {
-		Composite composite = createDefaultComposite(parent);
-
-		// Label for owner field
-		Label ownerLabel = new Label(composite, SWT.NONE);
-		ownerLabel.setText("");
-
-		// Owner text field
-		ownerText = new Text(composite, SWT.SINGLE | SWT.BORDER);
-		GridData gd = new GridData();
-		gd.widthHint = convertWidthInCharsToPixels(TEXT_FIELD_WIDTH);
-		ownerText.setLayoutData(gd);
-
-		
-		
-		// Populate owner text field
-		try {
-			String owner =
-				((IResource) getElement()).getPersistentProperty(
-					new QualifiedName("", OWNER_PROPERTY));
-			ownerText.setText((owner != null) ? owner : DEFAULT_OWNER);
-		} catch (CoreException e) {
-			ownerText.setText(DEFAULT_OWNER);
-		}
-	}
-	*/
 	
 	/**
 	 * @see PreferencePage#createContents(Composite)
@@ -197,35 +146,26 @@ public class SamplePropertyPage extends PropertyPage {
 		data.grabExcessHorizontalSpace = true;
 		composite.setLayoutData(data);
 
-		addSection(composite);
+		addCompileOptionsGroup(composite);
+		populateCompileOptionsGroup();
+		
 		return composite;
 	}
 
-	private Composite createDefaultComposite(Composite parent) {
-		Composite composite = new Composite(parent, SWT.NULL);
-		GridLayout layout = new GridLayout();
-		layout.numColumns = 2;
-		composite.setLayout(layout);
-
-		GridData data = new GridData();
-		data.verticalAlignment = GridData.FILL;
-		data.horizontalAlignment = GridData.FILL;
-		composite.setLayoutData(data);
-
-		return composite;
-	}
 
 	protected void performDefaults() {
-		// Populate the owner text field with the default value
+		// Populate the output path text field with the default value
 		outputPathText.setText(DEFAULT_OUTPUT_PATH);
 	}
 	
 	public boolean performOk() {
 		// store the value in the owner text field
 		try {
-			((IResource) getElement()).setPersistentProperty(
+			IResource rsrc = ((IResource) getElement());
+			rsrc.setPersistentProperty(
 				new QualifiedName("", OUTPUT_PATH_PROPERTY),
 				outputPathText.getText());
+			
 		} catch (CoreException e) {
 			return false;
 		}
