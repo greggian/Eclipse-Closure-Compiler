@@ -38,6 +38,7 @@ import com.gg.eclipse.closure.settings.IClosureSettings;
 public class CompilerPropertyPage extends PropertyPage {
 	
 	private Text outputPathText;
+	private Text outputFilenameText;
 
 	/**
 	 * Constructor for SamplePropertyPage.
@@ -55,15 +56,25 @@ public class CompilerPropertyPage extends PropertyPage {
 		
 		// Label for output folder field
 		Label outputPathLabel = new Label(group, SWT.NONE);
-		outputPathLabel.setText("Default output folder: ");
+		outputPathLabel.setText("Output folder: ");
 
 		// output folder text field
 		outputPathText = new Text(group, SWT.SINGLE | SWT.BORDER);
 		outputPathText.setLayoutData(new GridData(GridData.FILL, GridData.CENTER, true, false));
 
-		
 		Button outputPathButton = new Button(group, SWT.NONE);
 		outputPathButton.setText("Browse...");
+		
+		
+		// Label for output filename field
+		Label outputFilenameLabel = new Label(group, SWT.NONE);
+		outputFilenameLabel.setText("Output filename: ");
+		
+		// output filename text field
+		outputFilenameText = new Text(group, SWT.SINGLE | SWT.BORDER);
+		outputFilenameText.setLayoutData(new GridData(GridData.FILL, GridData.CENTER, true, false, 2, 1));	
+		
+
 		outputPathButton.addSelectionListener(new SelectionListener(){
 			public void widgetDefaultSelected(SelectionEvent arg0) {
 			}
@@ -86,6 +97,9 @@ public class CompilerPropertyPage extends PropertyPage {
 		final IPath path = settings.getOutputFolder();
 		final IPath workspaceRelativePath = rsrc.getFullPath().append(path).makeRelative();
 		outputPathText.setText(workspaceRelativePath.toOSString());
+		
+		final String filename = settings.getOutputFile();
+		outputFilenameText.setText(filename);
 		
 	}
 	
@@ -174,7 +188,9 @@ public class CompilerPropertyPage extends PropertyPage {
 		try {
 			final IPath specifiedPath = Path.fromOSString(outputPathText.getText());
 			final IPath relativePath = specifiedPath.removeFirstSegments(1).makeRelative();
-			final IClosureSettings settings = new ClosureSettings(relativePath, "unused");
+			
+			final String filename = outputFilenameText.getText();
+			final IClosureSettings settings = new ClosureSettings(relativePath, filename);
 			
 			final IResource rsrc = ((IResource) getElement());
 			final ClosureSettingsManager manager = new ClosureSettingsManager(rsrc);

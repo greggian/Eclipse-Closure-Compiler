@@ -123,7 +123,7 @@ public class Builder extends IncrementalProjectBuilder {
 		ClosureSettingsManager manager = new ClosureSettingsManager(prj);
 		IClosureSettings settings = manager.getSettings();
 		IPath relativeOutput = settings.getOutputFolder();
-		IPath outputPath = relativeOutput.append("closureCompiled.js");
+		IPath outputPath = relativeOutput.append(settings.getOutputFile());
 		
 		IFile outFile = prj.getFile(outputPath);
 		if(outFile.exists()){
