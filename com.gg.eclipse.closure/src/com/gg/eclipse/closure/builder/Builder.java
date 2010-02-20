@@ -15,17 +15,14 @@ import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.QualifiedName;
-//import org.eclipse.wst.jsdt.core.IJavaScriptProject;
-//import org.eclipse.wst.jsdt.core.JavaScriptCore;
 
-
+import com.gg.eclipse.closure.settings.ClosureSettingsManager;
+import com.gg.eclipse.closure.settings.IClosureSettings;
 import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.jscomp.JSSourceFile;
-import com.google.javascript.jscomp.WarningLevel;
 import com.google.javascript.jscomp.Result;
+import com.google.javascript.jscomp.WarningLevel;
 
 
 public class Builder extends IncrementalProjectBuilder {
@@ -123,8 +120,9 @@ public class Builder extends IncrementalProjectBuilder {
 		InputStream is = new ByteArrayInputStream(compiledJs.getBytes());
 		
 		IProject prj = getProject();
-		String outputFolder = prj.getPersistentProperty(new QualifiedName("","CLOSURE_OUTPUT_PATH"));
-		IPath relativeOutput = new Path(outputFolder).makeAbsolute().makeRelativeTo(prj.getFullPath());
+		ClosureSettingsManager manager = new ClosureSettingsManager(prj);
+		IClosureSettings settings = manager.getSettings();
+		IPath relativeOutput = settings.getOutputFolder();
 		IPath outputPath = relativeOutput.append("closureCompiled.js");
 		
 		IFile outFile = prj.getFile(outputPath);

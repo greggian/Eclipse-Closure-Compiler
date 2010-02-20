@@ -9,7 +9,8 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.QualifiedName;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.ViewerFilter;
@@ -29,11 +30,12 @@ import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.eclipse.ui.views.navigator.ResourceComparator;
 
+import com.gg.eclipse.closure.settings.ClosureSettings;
+import com.gg.eclipse.closure.settings.ClosureSettingsManager;
+import com.gg.eclipse.closure.settings.IClosureSettings;
+
 
 public class CompilerPropertyPage extends PropertyPage {
-
-	private static final String OUTPUT_PATH_PROPERTY = "CLOSURE_OUTPUT_PATH";
-	private static final String DEFAULT_OUTPUT_PATH = "bin";
 	
 	private Text outputPathText;
 
@@ -77,16 +79,13 @@ public class CompilerPropertyPage extends PropertyPage {
 		
 	}
 	
-	private void populateCompileOptionsGroup(){
+	private void populateCompileOptionsGroup(final IClosureSettings settings){
+		IResource rsrc = (IResource)getElement();
+		
 		// Populate output folder text field
-		try {
-			String owner =
-				((IResource) getElement()).getPersistentProperty(
-					new QualifiedName("", OUTPUT_PATH_PROPERTY));
-			outputPathText.setText((owner != null) ? owner : DEFAULT_OUTPUT_PATH);
-		} catch (CoreException e) {
-			outputPathText.setText(DEFAULT_OUTPUT_PATH);
-		}
+		final IPath path = settings.getOutputFolder();
+		final IPath workspaceRelativePath = rsrc.getFullPath().append(path).makeRelative();
+		outputPathText.setText(workspaceRelativePath.toOSString());
 		
 	}
 	
@@ -147,25 +146,39 @@ public class CompilerPropertyPage extends PropertyPage {
 		composite.setLayoutData(data);
 
 		addCompileOptionsGroup(composite);
-		populateCompileOptionsGroup();
+		populateCompileOptionsGroup(getPersistedSettings());
 		
 		return composite;
 	}
 
+	protected IClosureSettings getPersistedSettings(){
+		final IResource rsrc = (IResource)getElement();
+		final ClosureSettingsManager manager = new ClosureSettingsManager(rsrc);
+		
+		IClosureSettings settings = null;
+		try {
+			settings = manager.getSettings();
+		} catch (CoreException e) {
+			settings = ClosureSettingsManager.getDefaultSettings();
+		}
+		return settings;
+	}
 
 	protected void performDefaults() {
-		// Populate the output path text field with the default value
-		outputPathText.setText(DEFAULT_OUTPUT_PATH);
+		final IClosureSettings defaultSettings = ClosureSettingsManager.getDefaultSettings();
+		populateCompileOptionsGroup(defaultSettings);
 	}
 	
 	public boolean performOk() {
 		// store the value in the owner text field
 		try {
-			IResource rsrc = ((IResource) getElement());
-			rsrc.setPersistentProperty(
-				new QualifiedName("", OUTPUT_PATH_PROPERTY),
-				outputPathText.getText());
+			final IPath specifiedPath = Path.fromOSString(outputPathText.getText());
+			final IPath relativePath = specifiedPath.removeFirstSegments(1).makeRelative();
+			final IClosureSettings settings = new ClosureSettings(relativePath, "unused");
 			
+			final IResource rsrc = ((IResource) getElement());
+			final ClosureSettingsManager manager = new ClosureSettingsManager(rsrc);
+			manager.storeSettings(settings);
 		} catch (CoreException e) {
 			return false;
 		}
